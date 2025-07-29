@@ -2,7 +2,7 @@
 
 매트릭스 영화 스타일의 404 에러 페이지로, 한국어와 영어 다국어 지원 및 커스터마이징 가능한 디지털 레인 효과를 제공합니다.
 
-> **English version**: [README.md](README.md)
+> **English version**: [README_EN.md](README_EN.md)
 
 ## ✨ 주요 기능
 
