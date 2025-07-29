@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix 404</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&family=Nanum+Pen+Script&family=Jua&family=Gamja+Flower&family=Do+Hyeon&family=Black+Han+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 토글 버튼을 패널 밖으로 분리 -->
+        <button class="toggle-btn" id="toggleBtn">◀</button>
+        
+        <!-- 설정 패널 -->
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <h3 data-lang-key="settings_title">Matrix Settings</h3>
+            </div>
+            
+            <!-- 언어 토글 버튼 -->
+            <div class="language-toggle">
+                <button class="lang-btn active" data-lang="ko">한글</button>
+                <span class="lang-separator">|</span>
+                <button class="lang-btn" data-lang="en">Eng</button>
+            </div>
+            
+            <div class="settings-content">
+                <div class="setting-group">
+                    <label data-lang-key="font_label">글꼴</label>
+                    <select id="fontSelect">
+                        <option value="'Noto Sans KR', sans-serif">Noto Sans Korean</option>
+                        <option value="'Malgun Gothic', sans-serif">맑은 고딕</option>
+                        <option value="'Nanum Gothic', sans-serif">나눔고딕</option>
+                        <option value="'Nanum Myeongjo', serif">나눔명조</option>
+                        <option value="'Nanum Pen Script', cursive">나눔펜스크립트</option>
+                        <option value="'Jua', cursive">주아</option>
+                        <option value="'Gamja Flower', cursive">감자꽃</option>
+                        <option value="'Do Hyeon', sans-serif">도현</option>
+                        <option value="'Black Han Sans', sans-serif">검은고딕</option>
+                        <option value="'Courier New', monospace">Courier New</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label><span data-lang-key="font_size_label">글꼴 크기</span>: <span id="fontSizeValue">16</span>px</label>
+                    <input type="range" id="fontSizeSlider" min="12" max="24" value="16">
+                </div>
+
+                <div class="setting-group">
+                    <label><span data-lang-key="speed_label">떨어지는 속도</span>: <span id="speedValue">5</span></label>
+                    <input type="range" id="speedSlider" min="0" max="10" value="5">
+                </div>
+
+                <div class="setting-group">
+                    <label data-lang-key="color_label">색상</label>
+                    <div class="color-options">
+                        <button class="color-btn active" data-color="green" style="background: #00ff00;"></button>
+                        <button class="color-btn" data-color="amber" style="background: #ffbf00;"></button>
+                        <button class="color-btn" data-color="gray" style="background: #888888;"></button>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <label data-lang-key="mouse_effect_label">마우스 효과</label>
+                    <select id="mouseEffectSelect">
+                        <option value="ripple" data-lang-key="ripple_option">Ripple</option>
+                        <option value="explosion" data-lang-key="explosion_option">Explosion</option>
+                        <option value="freeze" data-lang-key="freeze_option">Freeze</option>
+                        <option value="none" data-lang-key="none_option">None</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label data-lang-key="canvas_size_label">캔버스 크기</label>
+                    <select id="canvasSizeSelect">
+                        <option value="fullscreen" data-lang-key="fullscreen_option">전체화면</option>
+                        <option value="fixed" data-lang-key="fixed_option">고정크기</option>
+                        <option value="custom" data-lang-key="custom_option">사용자정의</option>
+                    </select>
+                </div>
+                
+                <!-- 사용자 입력 패널을 설정 패널 내부로 이동 -->
+                <div class="text-input-section">
+                    <div class="input-group">
+                        <label for="titleInput" data-lang-key="title_input_label">제목</label>
+                        <input type="text" id="titleInput" value="404" maxlength="20">
+                    </div>
+                    <div class="input-group">
+                        <label for="messageInput" data-lang-key="message_input_label">메시지</label>
+                        <input type="text" id="messageInput" value="You've been disconnected from the Matrix" maxlength="80">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 메인 캔버스 -->
+        <canvas id="matrixCanvas"></canvas>
+        
+        <!-- 404 메시지 -->
+        <div class="message-overlay">
+            <h1 id="errorTitle">404</h1>
+            <p id="errorMessage" data-lang-key="error_message">You've been disconnected from the Matrix</p>
+            <button class="return-btn" onclick="window.history.back()" data-lang-key="return_button">Return to Reality</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

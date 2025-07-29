@@ -1,0 +1,648 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    background: #000;
+    font-family: 'Courier New', monospace;
+    color: #00ff00;
+}
+
+.container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* 캔버스 스타일 */
+#matrixCanvas {
+    display: block;
+    background: #000;
+    width: 100%;
+    height: 100%;
+}
+
+/* 설정 패널 */
+.settings-panel {
+    position: fixed;
+    top: 0;
+    left: 50px;
+    width: 300px;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    border-right: 0.5px solid #00ff00;
+    z-index: 1000;
+    transition: transform 0.3s ease, border-color 0.3s ease, color 0.3s ease, background 0.3s ease, border-right 0.3s ease;
+    color: #00ff00;
+}
+
+.settings-panel.collapsed {
+    transform: translateX(-300px);
+    background: transparent;
+    border-right: none;
+}
+
+/* 토글 버튼이 이제 패널 밖에 있으므로 이 스타일은 불필요 */
+
+.settings-panel.collapsed .settings-content {
+    display: none;
+}
+
+.settings-panel.collapsed .settings-header {
+    border-bottom: none;
+}
+
+.settings-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 0.5px solid #00ff00;
+    transition: border-color 0.3s ease, border-bottom 0.3s ease;
+}
+
+.settings-header h3 {
+    font-size: 18px;
+    margin: 0;
+}
+
+.toggle-btn {
+    background: transparent;
+    border: 0.5px solid #00ff00;
+    color: #00ff00;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    position: fixed;
+    left: 20px;
+    top: 40px;
+    z-index: 1001;
+}
+
+.toggle-btn:hover {
+    background: #00ff00;
+    color: #000;
+}
+
+.settings-content {
+    padding: 20px;
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+}
+
+.setting-group {
+    margin-bottom: 25px;
+}
+
+.setting-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.setting-group select,
+.setting-group input[type="range"] {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 0.5px solid #00ff00;
+    border-radius: 6px;
+    color: #00ff00;
+    font-family: inherit;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.setting-group select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ff00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.setting-group select:hover,
+.setting-group select:focus {
+    border-color: #00ff88;
+    background-color: rgba(0, 255, 0, 0.05);
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.2);
+}
+
+.setting-group select option {
+    background: rgba(0, 0, 0, 0.95);
+    color: #00ff00;
+    padding: 12px 15px;
+    border: none;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.setting-group select option:hover,
+.setting-group select option:checked {
+    background: rgba(0, 255, 0, 0.1);
+    color: #00ff88;
+}
+
+.setting-group input[type="range"] {
+    cursor: pointer;
+    accent-color: #00ff00;
+    transition: accent-color 0.3s ease;
+    padding: 8px 15px;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.setting-group input[type="range"]:hover,
+.setting-group input[type="range"]:focus {
+    border-color: #00ff88;
+    background-color: rgba(0, 255, 0, 0.05);
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.2);
+}
+
+.setting-group span {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+/* 색상 옵션 */
+.color-options {
+    display: flex;
+    gap: 10px;
+}
+
+.color-btn {
+    width: 50px;
+    height: 30px;
+    border: 0.5px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 10px;
+    color: #000;
+    font-weight: bold;
+}
+
+.color-btn.active {
+    border-color: #fff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* 메시지 오버레이 */
+.message-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 500;
+    pointer-events: none;
+}
+
+.message-overlay h1 {
+    font-size: clamp(4rem, 12vw, 22.5rem);
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px currentColor;
+    animation: glow 2s ease-in-out infinite alternate;
+    line-height: 1;
+}
+
+.message-overlay p {
+    font-size: clamp(1rem, 3vw, 3.75rem);
+    margin-bottom: 30px;
+    opacity: 0.8;
+    line-height: 1.2;
+}
+
+.return-btn {
+    background: transparent;
+    border: 0.5px solid currentColor;
+    color: inherit;
+    padding: 15px 30px;
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    pointer-events: all;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.return-btn:hover {
+    background: currentColor;
+    color: #000;
+    box-shadow: 0 0 20px currentColor;
+}
+
+/* 글로우 애니메이션 */
+@keyframes glow {
+    from {
+        text-shadow: 0 0 20px currentColor;
+    }
+    to {
+        text-shadow: 0 0 30px currentColor, 0 0 40px currentColor;
+    }
+}
+
+/* 제목 깜빡임 애니메이션 */
+@keyframes titleGlow {
+    0% { 
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% { 
+        transform: scale(1.1);
+        filter: brightness(1.5);
+        text-shadow: 0 0 30px currentColor, 0 0 50px currentColor;
+    }
+    100% { 
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
+/* 메시지 깜빡임 애니메이션 */
+@keyframes messageGlow {
+    0% { 
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% { 
+        transform: scale(1.05);
+        filter: brightness(1.3);
+        text-shadow: 0 0 15px currentColor;
+    }
+    100% { 
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
+/* UI 요소 깜빡임 애니메이션 */
+@keyframes uiGlow {
+    0% { 
+        transform: scale(1);
+        filter: brightness(1);
+        box-shadow: none;
+    }
+    50% { 
+        transform: scale(1.02);
+        filter: brightness(1.2);
+        box-shadow: 0 0 10px currentColor;
+    }
+    100% { 
+        transform: scale(1);
+        filter: brightness(1);
+        box-shadow: none;
+    }
+}
+
+/* 색상 테마 */
+.theme-green {
+    color: #00ff00;
+}
+
+.theme-green .settings-panel {
+    border-right-color: #00ff00;
+    color: #00ff00;
+}
+
+.theme-green .settings-header {
+    border-bottom-color: #00ff00;
+}
+
+.theme-green .toggle-btn {
+    border-color: #00ff00;
+    color: #00ff00;
+}
+
+.theme-green .toggle-btn:hover {
+    background: #00ff00;
+    color: #000;
+}
+
+.theme-green .setting-group select,
+.theme-green .setting-group input[type="range"] {
+    border-color: #00ff00;
+    color: #00ff00;
+}
+
+.theme-green .setting-group select:hover,
+.theme-green .setting-group select:focus,
+.theme-green .setting-group input[type="range"]:hover,
+.theme-green .setting-group input[type="range"]:focus {
+    border-color: #00ff88;
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.2);
+}
+
+.theme-green .setting-group select option {
+    background: rgba(0, 0, 0, 0.95);
+    color: #00ff00;
+}
+
+.theme-green .setting-group select option:hover,
+.theme-green .setting-group select option:checked {
+    background: rgba(0, 255, 0, 0.1);
+    color: #00ff88;
+}
+
+.theme-green .setting-group input[type="range"] {
+    accent-color: #00ff00;
+}
+
+.theme-green .settings-content::-webkit-scrollbar-track {
+    background: rgba(0, 255, 0, 0.1);
+}
+
+.theme-green .settings-content::-webkit-scrollbar-thumb {
+    background: #00ff00;
+    border-radius: 4px;
+}
+
+.theme-green .settings-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 0, 0.8);
+}
+
+.theme-amber {
+    color: #ffbf00;
+}
+
+.theme-amber .settings-panel {
+    border-right-color: #ffbf00;
+    color: #ffbf00;
+}
+
+.theme-amber .settings-header {
+    border-bottom-color: #ffbf00;
+}
+
+.theme-amber .toggle-btn {
+    border-color: #ffbf00;
+    color: #ffbf00;
+}
+
+.theme-amber .toggle-btn:hover {
+    background: #ffbf00;
+    color: #000;
+}
+
+.theme-amber .setting-group select,
+.theme-amber .setting-group input[type="range"] {
+    border-color: #ffbf00;
+    color: #ffbf00;
+}
+
+.theme-amber .setting-group select:hover,
+.theme-amber .setting-group select:focus,
+.theme-amber .setting-group input[type="range"]:hover,
+.theme-amber .setting-group input[type="range"]:focus {
+    border-color: #ffdf00;
+    box-shadow: 0 0 8px rgba(255, 191, 0, 0.2);
+}
+
+.theme-amber .setting-group select option {
+    background: rgba(0, 0, 0, 0.95);
+    color: #ffbf00;
+}
+
+.theme-amber .setting-group select option:hover,
+.theme-amber .setting-group select option:checked {
+    background: rgba(255, 191, 0, 0.1);
+    color: #ffdf00;
+}
+
+.theme-amber .setting-group input[type="range"] {
+    accent-color: #ffbf00;
+}
+
+.theme-amber .settings-content::-webkit-scrollbar-track {
+    background: rgba(255, 191, 0, 0.1);
+}
+
+.theme-amber .settings-content::-webkit-scrollbar-thumb {
+    background: #ffbf00;
+    border-radius: 4px;
+}
+
+.theme-amber .settings-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 191, 0, 0.8);
+}
+
+.theme-gray {
+    color: #888888;
+}
+
+.theme-gray .settings-panel {
+    border-right-color: #888888;
+    color: #888888;
+}
+
+.theme-gray .settings-header {
+    border-bottom-color: #888888;
+}
+
+.theme-gray .toggle-btn {
+    border-color: #888888;
+    color: #888888;
+}
+
+.theme-gray .toggle-btn:hover {
+    background: #888888;
+    color: #000;
+}
+
+.theme-gray .setting-group select,
+.theme-gray .setting-group input[type="range"] {
+    border-color: #888888;
+    color: #888888;
+}
+
+.theme-gray .setting-group select:hover,
+.theme-gray .setting-group select:focus,
+.theme-gray .setting-group input[type="range"]:hover,
+.theme-gray .setting-group input[type="range"]:focus {
+    border-color: #aaaaaa;
+    box-shadow: 0 0 8px rgba(136, 136, 136, 0.2);
+}
+
+.theme-gray .setting-group select option {
+    background: rgba(0, 0, 0, 0.95);
+    color: #888888;
+}
+
+.theme-gray .setting-group select option:hover,
+.theme-gray .setting-group select option:checked {
+    background: rgba(136, 136, 136, 0.1);
+    color: #aaaaaa;
+}
+
+.theme-gray .setting-group input[type="range"] {
+    accent-color: #888888;
+}
+
+.theme-gray .settings-content::-webkit-scrollbar-track {
+    background: rgba(136, 136, 136, 0.1);
+}
+
+.theme-gray .settings-content::-webkit-scrollbar-thumb {
+    background: #888888;
+    border-radius: 4px;
+}
+
+.theme-gray .settings-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(136, 136, 136, 0.8);
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+    .settings-panel {
+        width: 250px;
+    }
+    
+    .settings-panel.collapsed {
+        transform: translateX(-200px);
+    }
+    
+    .return-btn {
+        padding: 10px 20px;
+        font-size: clamp(0.8rem, 2vw, 1rem);
+    }
+    
+    .settings-content {
+        padding: 15px;
+    }
+    
+    .color-btn {
+        width: 40px;
+        height: 25px;
+        font-size: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .settings-panel {
+        width: 200px;
+    }
+    
+    .settings-panel.collapsed {
+        transform: translateX(-150px);
+    }
+    
+    .settings-header h3 {
+        font-size: 14px;
+    }
+    
+    .settings-content {
+        padding: 10px;
+    }
+    
+    .setting-group {
+        margin-bottom: 20px;
+    }
+}
+
+/* 언어 토글 버튼 */
+.language-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 0.5px solid currentColor;
+    gap: 8px;
+}
+
+.lang-btn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 10px;
+    transition: all 0.3s ease;
+    opacity: 0.6;
+}
+
+.lang-btn.active {
+    opacity: 1;
+    color: inherit;
+    text-shadow: 0 0 10px currentColor;
+}
+
+.lang-btn:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+.lang-separator {
+    color: inherit;
+    opacity: 0.4;
+    font-weight: normal;
+}
+
+/* 설정 패널 내 텍스트 입력 섹션 */
+.text-input-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 0.5px solid currentColor;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: inherit;
+}
+
+.text-input-section .input-group {
+    margin-bottom: 15px;
+}
+
+.text-input-section .input-group:last-child {
+    margin-bottom: 0;
+}
+
+.text-input-section .input-group label {
+    display: block;
+    color: inherit;
+    font-size: 13px;
+    margin-bottom: 5px;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.text-input-section .input-group input {
+    width: 100%;
+    background: #000;
+    border: 0.5px solid currentColor;
+    color: inherit;
+    padding: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+.text-input-section .input-group input:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* 커스텀 스크롤바 */
+.settings-content::-webkit-scrollbar {
+    width: 8px;
+}
