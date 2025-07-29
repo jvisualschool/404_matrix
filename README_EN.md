@@ -2,7 +2,7 @@
 
 A cinematic Matrix-style 404 error page with Korean and English multilingual support, featuring cascading digital rain effects and customizable settings.
 
-> **한국어**: [README_KO.md](README_KO.md)
+> **한국어**: [README.md](README.md)
 
 ## ✨ Features
 
